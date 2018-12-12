@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { updateScore } from '../actions/actions'
 import Game from './Game'
 
-class App extends Component {
+class GameScreen extends Component {
     render() {
         const { dispatch, game } = this.props
 
@@ -21,4 +21,4 @@ function select(state) {
     }
 }
 
-export default connect(select)(App);
+export default connect(select)(GameScreen);
