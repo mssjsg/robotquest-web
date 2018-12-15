@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Provider } from 'react-redux'
 import { BrowserRouter as Router, Route } from 'react-router-dom'
-import GameScreen from './GameScreen'
-import GameOver from './GameOver';
-import MainMenu from './MainMenu';
+import GameScreen from './game/GameScreen'
+import GameOver from './gameover/GameOver';
+import MainMenu from './main/MainMenu';
 
 const Root = ({ store }) => (
   <Provider store={store}>

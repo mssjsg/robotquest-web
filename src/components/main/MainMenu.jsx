@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Link, withRouter } from "react-router-dom";
-import { setCharName } from '../actions/actions'
+import { setCharName } from '../../actions/gameActions';
 
 class MainMenu extends Component {
     constructor(props) {
@@ -30,7 +30,7 @@ class MainMenu extends Component {
         const { dispatch, game } = this.props;
 
         return (
-            <div>
+            <div className="screen main-menu">
                 <h1>Robot Quest</h1>
                 <label>
                     Your Name:

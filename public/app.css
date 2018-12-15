@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css?family=Staatliches');
+
+html > body {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	background: black;
+	overflow: hidden;
+}
+
+body > #root > div {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	background: black;
+}
+
+.screen {
+	max-width: 600px;
+	height: 100%;
+	font-size: 16px;
+	font-family: Staatliches;
+	margin: auto;
+}
+
+.main-menu {
+	background: #538b9c;
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.main-menu h1 {
+	font-size: 60px;
+	color: black;
+	font-family: Staatliches;
+	text-align: center;
+	width: 100%;
+	margin-top: 40px;
+}
+
+.main-menu label {
+	font-size: 20px;
+	margin-top: 50px;
+}
+
+.main-menu label input {
+	height: 20px;
+	margin-left: 16px;
+}
+
+.main-menu  li a:link, a:visited {
+	min-width: 100px;
+	font-size: 30px;
+	color: #b98d8a;
+	background-color: #265970;
+	padding: 14px 25px;
+	text-align: center; 
+	text-decoration: none;
+	display: inline-block;
+  }
+  
+.main-menu a:hover, a:active {
+	background-color: #347897;
+}
+
+.main-menu > ul {
+	margin: 30px;
+}
+
+.main-menu > ul li {
+	margin: 15px;
+}
+
+.game-stage {
+	background: #265970;
+}
+
+.game-stage .map {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	position: relative;
+}
+
+.game-stage .tile{
+	text-align: center;
+	width: 80px;
+	height: 80px;
+	position: relative;
+	line-height: 80px;
+}

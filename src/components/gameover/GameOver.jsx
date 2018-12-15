@@ -1,15 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { updateScore } from '../actions/actions'
-import Game from './Game'
 
-class GameScreen extends Component {
+class GameOver extends Component {
     render() {
         const { dispatch, game } = this.props
 
         return (
             <div>
-                <Game score={game.score} onUpdateClick={text => dispatch(updateScore(text))}/>
+                <p>Game Over</p>
             </div>
         )
     }
@@ -21,4 +19,4 @@ function select(state) {
     }
 }
 
-export default connect(select)(GameScreen);
+export default connect(select)(GameOver);
