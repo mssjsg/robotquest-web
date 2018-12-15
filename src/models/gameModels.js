@@ -1,6 +1,14 @@
-function Game({ stage, player }) {
-    this.stage = new Stage(stage);
-    this.player = new Player(player);
+function Game({ stage, player, timeUpdateInterval = 100, screenWidth = 0, screenHeight = 0, tileDimen = 80 }) {
+    if (stage) {
+        this.stage = new Stage(stage);
+    }
+    if (player) {
+        this.player = new Player(player);
+    }
+    this.timeUpdateInterval = timeUpdateInterval;
+    this.screenWidth = screenWidth;
+    this.screenHeight = screenHeight;
+    this.tileDimen = tileDimen;
 }
 
 function Position({ x, y }) {
@@ -8,25 +16,32 @@ function Position({ x, y }) {
     this.y = y;
 }
 
-function Stage({ index = 0, width = 10, height = 10, tiles, objs, enemy }) {
+function Stage({ index = 0, width = 10, height = 10, tiles,
+    objs, enemy, nextMapX = 0,  nextMapY = 0, mapX = 0, mapY = 0}) {
     this.index = index;
     this.width = width;
     this.height = height;
     this.tiles = tiles;
     this.objs = objs;
     this.enemy = enemy;
+    this.nextMapX = nextMapX;
+    this.nextMapY = nextMapY;
+    this.mapX = mapX;
+    this.mapY = mapY;
 }
 
 function Tile({ color }) {
     this.color = color;
 }
 
-function Player({ name = "Teku", position = { x: 0, y: 0 }, hp = 100, mp = 0, exp = 0}) {
+function Player({ name = "Teku", position = { x: 0, y: 0 }, targetPosition = { x: 0, y: 0 },
+    hp = 100, mp = 0, exp = 0}) {
     this.name = name;
     this.position = new Position(position);
     this.hp = hp;
     this.mp = mp;
     this.exp = exp;
+    this.targetPosition = targetPosition;
 }
 
 export {
