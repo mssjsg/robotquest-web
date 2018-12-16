@@ -17,7 +17,6 @@ export default class GameStage extends Component {
 
     render() {
         let game = this.props.game;
-
         let mapHeight = 80 * game.stage.height;
 
         let getTile = (item, x, y) => {
