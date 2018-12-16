@@ -52,7 +52,7 @@ function Tile({ color }) {
 function Player({
     name = "Teku",
     position = { x: -1, y: -1 },
-    mapPosition = { x: -99999, y: 0 },
+    screenPosition = { x: -99999, y: 0 },
     hp = 100,
     mp = 0,
     exp = 0,
@@ -64,7 +64,7 @@ function Player({
     this.mp = mp;
     this.exp = exp;
     this.speed = speed;
-    this.mapPosition = mapPosition;
+    this.screenPosition = screenPosition;
 }
 
 export {

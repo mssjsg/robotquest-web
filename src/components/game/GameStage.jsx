@@ -64,8 +64,8 @@ export default class GameStage extends Component {
                     }
                 </div>
                 <div key="player" className="player noselect" style={{
-                    left: game.player.mapPosition.x,
-                    top: game.player.mapPosition.y
+                    left: game.player.screenPosition.x,
+                    top: game.player.screenPosition.y
                 }}>{game.player.name}</div>
             </div>
         )
