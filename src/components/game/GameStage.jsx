@@ -23,7 +23,7 @@ export default class GameStage extends Component {
         let getTile = (item, x, y) => {
             let color = parseInt(255 * item.tile.color / 10);
             let background = `rgb(${color}, ${color}, ${color})`;
-            return <div className="tile" onClick={() => this.props.onTileClick(x, y)}
+            return <div className="tile noselect" onClick={() => this.props.onTileClick(x, y)}
                 style={{ background }} key={x * mapHeight + y}>
                     {`${x}, ${y}`}
             </div>
