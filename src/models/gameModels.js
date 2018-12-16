@@ -17,15 +17,13 @@ function Position({ x, y }) {
 }
 
 function Stage({ index = 0, width = 10, height = 10, tiles,
-    objs, enemy, nextMapX = 0,  nextMapY = 0, mapX = 0, mapY = 0}) {
+    objs, enemy, mapX = -1,  mapY = -1}) {
     this.index = index;
     this.width = width;
     this.height = height;
     this.tiles = tiles;
     this.objs = objs;
     this.enemy = enemy;
-    this.nextMapX = nextMapX;
-    this.nextMapY = nextMapY;
     this.mapX = mapX;
     this.mapY = mapY;
 }

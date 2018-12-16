@@ -29,8 +29,8 @@ export default class GameStage extends Component {
             </div>
         }
 
-        let mapTop = game.stage.nextMapY;
-        let mapLeft = game.stage.nextMapX;
+        let mapTop = game.stage.mapY;
+        let mapLeft = game.stage.mapX;
 
         return (
             <div className="screen game-stage" ref={this.screen}>

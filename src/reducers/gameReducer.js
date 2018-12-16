@@ -1,8 +1,14 @@
 // this reducer is for reducing the rendering of the game
 import { Tile, Stage, Game, Position, Player } from "../models/gameModels"
-import { LOAD_STAGE, SET_CHAR_NAME, MOVE_PLAYER, TIME_UPDATED, UPDATE_SCREEN_SIZE } from "../actions/gameActions"
+import {
+    LOAD_STAGE,
+    SET_CHAR_NAME,
+    MOVE_PLAYER,
+    TIME_UPDATED,
+    UPDATE_SCREEN_SIZE
+} from "../actions/gameActions"
 
-const MOVE_SPEED = 30;
+const MOVE_SPEED = 70;
 
 const initialState = new Game({
     stage: loadStage(0),
@@ -33,41 +39,48 @@ function getMapLeft(tileDimen, screenWidth, targetX) {
     return screenWidth / 2 - tileDimen / 2 - targetX * tileDimen;
 }
 
+function getNextMapPos(stageMapPos, targetMapPos) {
+    let mapPos = targetMapPos;
+    if (stageMapPos != -1) {
+        if (targetMapPos > stageMapPos) {
+            mapPos = Math.min(stageMapPos + MOVE_SPEED, targetMapPos);
+        } else if (targetMapPos < stageMapPos) {
+            mapPos = Math.max(stageMapPos - MOVE_SPEED, targetMapPos);
+        }
+    }
+    return mapPos;
+}
+
 export function game(state = initialState, action) {
-    let newState;
+    let newGameAttrs = Object.assign({}, state);
     switch (action.type) {
         case LOAD_STAGE:
-            newState = new Game({ stage: null, player: state.player });
-            newState.stage = loadStage(action.index);
+            newGameAttrs.stage = loadStage(action.index);
             break;
         case SET_CHAR_NAME:
-            newState = new Game({ stage: state.stage, player: null });
-            newState.player = new Player(state.player);
-            newState.player.name = action.name;
+            newGameAttrs.player = new Player(state.player);
+            newGameAttrs.player.name = action.name;
             break;
         case MOVE_PLAYER:
-            newState = new Game({ stage: state.stage, player: null });
-            newState.player = new Player(state.player);
-            newState.player.targetPosition = new Position(action);
+            newGameAttrs.player = new Player(state.player);
+            newGameAttrs.player.targetPosition = new Position(action);
+            break;
+        case UPDATE_SCREEN_SIZE:
+            newGameAttrs.screenWidth = action.width;
+            newGameAttrs.screenHeight = action.height;
             break;
         case TIME_UPDATED:
             let game = state;
             let targetX = getMapLeft(game.tileDimen, game.screenWidth, game.player.targetPosition.x);
-            let targetY = getMapTop(game.tileDimen, game.screenWidth, game.player.targetPosition.y);
-            let mapX = targetX;
-            let mapY = targetY;
-            if (targetX > game.stage.mapX) {
-                mapX = Math.min(game.stage.mapX + MOVE_SPEED, targetX);
-            } else if (targetX < game.stage.mapX) {
-                mapX = Math.max(game.stage.mapX - MOVE_SPEED, targetX);
-            }
-            newState = new Game({ stage: state.stage, player: state.player });
-            newState.stage.nextMapX = mapX;
-            newState.stage.nextMapY = mapY;
+            let targetY = getMapTop(game.tileDimen, game.screenHeight, game.player.targetPosition.y);
+            console.log(`${game.tileDimen} ${game.screenHeight} ${game.player.targetPosition.y}`);
+            newGameAttrs.stage = new Stage(state.stage);
+            newGameAttrs.stage.mapX = getNextMapPos(game.stage.mapX, targetX);
+            newGameAttrs.stage.mapY = getNextMapPos(game.stage.mapY, targetY);
             break;
         default:
             return state;
     }
 
-    return newState;
+    return new Game(newGameAttrs);
 }
