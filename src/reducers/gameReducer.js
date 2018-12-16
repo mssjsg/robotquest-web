@@ -1,5 +1,5 @@
 // this reducer is for reducing the rendering of the game
-import { Tile, Stage, Game, Position, Player } from "../models/gameModels"
+import { Tile, Stage, Game, Position, Player, GameObject } from "../models/gameModels"
 import {
     LOAD_STAGE,
     SET_CHAR_NAME,
@@ -17,16 +17,27 @@ function loadStage(index) {
     let width = 10;
     let height = 10;
     let tiles = [];
+    let objs = [];
     for (let x = 0; x < width; x++) {
         let row = [];
         tiles.push(row);
+
+        let objRow = [];
+        objs.push(objRow);
         for (let y = 0; y < width; y++) {
             let tile = new Tile({ color: Math.floor(Math.random() * 10) });
             row.push({ tile });
+
+            let objectType = Math.floor(Math.random() * 6);
+            if (objectType == 1) {
+                objRow.push(new GameObject({ type: 1 }));
+            } else {
+                objRow.push(undefined);
+            }
         }
     }
 
-    return new Stage({ index, width, height, tiles });
+    return new Stage({ index, width, height, tiles, objs });
 }
 
 function getNextMapPos({
@@ -72,6 +83,11 @@ export function game(state = initialState, action) {
             newGameAttrs.stage = new Stage(state.stage);
             newGameAttrs.stage.screenWidth = action.width;
             newGameAttrs.stage.screenHeight = action.height;
+            newGameAttrs.player = new Player(state.player);
+            newGameAttrs.player.mapPosition = new Position({
+                x: action.width / 2 - newGameAttrs.stage.tileDimen / 2,
+                y: action.height / 2 - newGameAttrs.stage.tileDimen / 2
+            })
             break;
         case TIME_UPDATED:
             let stage = state.stage;

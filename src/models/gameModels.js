@@ -23,7 +23,7 @@ function Stage({
     height = 10,
     tiles,
     objs,
-    enemy,
+    chars,
     mapX = -1, 
     mapY = -1,
     targetPosition = { x: 0, y: 0 },
@@ -36,7 +36,7 @@ function Stage({
     this.height = height;
     this.tiles = tiles;
     this.objs = objs;
-    this.enemy = enemy;
+    this.chars = chars;
     this.mapX = mapX;
     this.mapY = mapY;
     this.targetPosition = targetPosition;
@@ -52,6 +52,7 @@ function Tile({ color }) {
 function Player({
     name = "Teku",
     position = { x: -1, y: -1 },
+    mapPosition = { x: -99999, y: 0 },
     hp = 100,
     mp = 0,
     exp = 0,
@@ -63,8 +64,17 @@ function Player({
     this.mp = mp;
     this.exp = exp;
     this.speed = speed;
+    this.mapPosition = mapPosition;
 }
 
 export {
-    Position, Game, Stage, Tile, Player
+    Position, Game, Stage, Tile, Player, GameObject
+}
+
+function GameObject({
+    type = 0,
+    name = "unknown"
+}) {
+    this.type = type;
+    this.name = name;
 }

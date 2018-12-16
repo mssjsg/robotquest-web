@@ -90,19 +90,45 @@ body>#root>div {
 
 .game-stage {
 	background: #265970;
+	position: relative;
 }
 
 .game-stage .map {
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
 	position: relative;
 }
 
+.game-stage .tile-container {
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+}
+
 .game-stage .tile {
-	text-align: center;
 	width: 80px;
 	height: 80px;
 	position: relative;
+	text-align: center;
 	line-height: 80px;
+}
+
+.game-stage .player {
+	width: 80px;
+	height: 80px;
+	background: blue;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	text-align: center;
+	line-height: 80px;
+}
+
+.game-stage .game-obj {
+	width: 80px;
+	height: 80px;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	text-align: center;
+	line-height: 80px;
+	white-space: nowrap;
 }
