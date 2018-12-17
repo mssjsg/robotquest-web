@@ -1,7 +1,12 @@
-function Game({
+export const MODE_MAP = 0;
+export const MODE_BATTLE = 1;
+
+export function Game({
     stage,
     player,
-    timeUpdateInterval = 100
+    timeUpdateInterval = 100,
+    mode = MODE_MAP,
+    modeMeta
 }) {
     if (stage) {
         this.stage = new Stage(stage);
@@ -10,14 +15,18 @@ function Game({
         this.player = new Player(player);
     }
     this.timeUpdateInterval = timeUpdateInterval;
+    this.mode = mode;
+    if (modeMeta != undefined) {
+        this.modeMeta = Object.assign({}, modeMeta);
+    }
 }
 
-function Position({ x, y }) {
+export function Position({ x, y }) {
     this.x = x;
     this.y = y;
 }
 
-function Stage({
+export function Stage({
     index = 0,
     width = 10,
     height = 10,
@@ -45,11 +54,11 @@ function Stage({
     this.tileDimen = tileDimen;
 }
 
-function Tile({ color }) {
+export function Tile({ color }) {
     this.color = color;
 }
 
-function Player({
+export function Player({
     name = "Teku",
     position = { x: -1, y: -1 },
     screenPosition = { x: -99999, y: 0 },
@@ -67,11 +76,7 @@ function Player({
     this.screenPosition = screenPosition;
 }
 
-export {
-    Position, Game, Stage, Tile, Player, GameObject
-}
-
-function GameObject({
+export function GameObject({
     type = 0,
     name = "unknown"
 }) {

@@ -132,3 +132,7 @@ body>#root>div {
 	line-height: 80px;
 	white-space: nowrap;
 }
+
+.battle-mode {
+	background: yellow;
+}

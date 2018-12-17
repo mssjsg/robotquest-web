@@ -1,5 +1,5 @@
 // this reducer is for reducing the rendering of the game
-import { Tile, Stage, Game, Position, Player, GameObject } from "../models/gameModels"
+import { Tile, Stage, Game, Position, Player, GameObject, MODE_BATTLE, MODE_MAP } from "../models/gameModels"
 import {
     LOAD_STAGE,
     SET_CHAR_NAME,
@@ -53,7 +53,7 @@ function getNextMapPos({
     let targetMapPos = screenDimen / 2 - tileDimen / 2 - targetPlayerPos * tileDimen;
     let mapPos = targetMapPos;
     let finished = false;
-    let blocked = -1;
+    let blocked = null;
 
     if (stageMapPos != -1) {
         if (targetMapPos > stageMapPos) {
@@ -62,7 +62,7 @@ function getNextMapPos({
             console.log(`limit min:${limit}`);
             if (mapPos > limit) {
                 mapPos = limit;
-                blocked = 0;
+                blocked = { direction: 0 };
             }
         } else if (targetMapPos < stageMapPos) {
             mapPos = Math.max(stageMapPos - speed, targetMapPos);
@@ -70,7 +70,7 @@ function getNextMapPos({
             console.log(`limit max:${limit}`);
             if (mapPos < limit) {
                 mapPos = limit;
-                blocked = 1;
+                blocked = { direction: 1 };
             }
         } else {
             finished = true;
@@ -121,7 +121,7 @@ export function game(state = initialState, action) {
             newGameAttrs.stage = new Stage(stage);
 
             let changed = false;
-            let blocked = -1;
+            let blocked = null;
             if (stage.targetPosition.x != player.position.x) {
                 let yLimitIndex = Math.floor(currentY);
                 let minObj, maxObj;
@@ -155,7 +155,7 @@ export function game(state = initialState, action) {
                 blocked = result.blocked;
             }
             
-            if ((blocked >= 0 || !changed || stage.mapY == -1) && stage.targetPosition.y != player.position.y) {
+            if ((blocked || !changed || stage.mapY == -1) && stage.targetPosition.y != player.position.y) {
                 let xLimitIndex = Math.floor(currentX);
                 let minObj, maxObj;
                 if (objectLimitIndexes.minY >= 0) {
@@ -181,7 +181,15 @@ export function game(state = initialState, action) {
                     newGameAttrs.player = new Player(state.player);
                     newGameAttrs.player.position.y = stage.targetPosition.y;
                 }
+                blocked = result.blocked;
             }
+
+            if (blocked) {
+                newGameAttrs.mode = MODE_BATTLE;
+            } else {
+                newGameAttrs.mode = MODE_MAP;
+            }
+
             break;
         default:
             return state;

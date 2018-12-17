@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import TimeCounter from './TimeCounter';
 
 export default class GameStage extends Component {
 
@@ -46,7 +45,6 @@ export default class GameStage extends Component {
 
         return (
             <div className="screen game-stage" ref={this.screen}>
-                <TimeCounter onTimeUpdated={this.props.onTimeUpdated} interval={game.timeUpdateInterval} />
                 <div className="map" style={{
                     left: mapLeft,
                     top: mapTop
