@@ -1,23 +1,26 @@
 export const MODE_MAP = 0;
 export const MODE_BATTLE = 1;
 
+/**
+ * overall game status
+ */
 export function Game({
     stage,
+    battle,
     player,
     timeUpdateInterval = 100,
-    mode = MODE_MAP,
-    modeMeta
+    mode = MODE_MAP
 }) {
-    if (stage) {
+    if (stage !== undefined) {
         this.stage = new Stage(stage);
     }
-    if (player) {
+    if (player !== undefined) {
         this.player = new Player(player);
     }
     this.timeUpdateInterval = timeUpdateInterval;
     this.mode = mode;
-    if (modeMeta != undefined) {
-        this.modeMeta = Object.assign({}, modeMeta);
+    if (battle !== undefined) {
+        this.battle = new Battle(battle);
     }
 }
 
@@ -26,6 +29,21 @@ export function Position({ x, y }) {
     this.y = y;
 }
 
+/**
+ * Battle mode
+ * @param {enemies, background}
+ */
+export function Battle({
+    enemies,
+    background
+}) {
+    this.enemies = enemies;
+    this.background = background;
+}
+
+/**
+ * map status
+ */
 export function Stage({
     index = 0,
     width = 10,
@@ -44,7 +62,15 @@ export function Stage({
     this.width = width;
     this.height = height;
     this.tiles = tiles;
-    this.objs = objs;
+    if (objs !== undefined) {
+        this.objs = objs.map(col => col.map(obj => {
+            if (obj != null) {
+                return new MapObject(obj);
+            } else {
+                return null;
+            }
+        }));
+    }
     this.chars = chars;
     this.mapX = mapX;
     this.mapY = mapY;
@@ -58,6 +84,20 @@ export function Tile({ color }) {
     this.color = color;
 }
 
+export function Enemy({
+    name = "Bad guy",
+    hp = 100,
+    mp = 0,
+}) {
+    this.name = name;
+    this.hp = hp;
+    this.mp = mp;
+}
+
+/**
+ * player status
+ * TODO teammates models??
+ */
 export function Player({
     name = "Teku",
     position = { x: -1, y: -1 },
@@ -65,7 +105,8 @@ export function Player({
     hp = 100,
     mp = 0,
     exp = 0,
-    speed = 70
+    speed = 70,
+    skills
 }) {
     this.name = name;
     this.position = new Position(position);
@@ -74,12 +115,25 @@ export function Player({
     this.exp = exp;
     this.speed = speed;
     this.screenPosition = screenPosition;
+    if (skills !== undefined) {
+        this.skills = skills.map(skill => new Skill(skill));
+    } else {
+        this.skills = [];
+    }
 }
 
-export function GameObject({
+export function MapObject({
     type = 0,
     name = "unknown"
 }) {
     this.type = type;
     this.name = name;
+}
+
+export function Skill({
+    name = "punch",
+    damage = 20
+}) {
+    this.name = name;
+    this.damage = damage;
 }

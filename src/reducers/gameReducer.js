@@ -1,5 +1,5 @@
 // this reducer is for reducing the rendering of the game
-import { Tile, Stage, Game, Position, Player, GameObject, MODE_BATTLE, MODE_MAP } from "../models/gameModels"
+import { Tile, Stage, Game, Position, Player, MapObject, MODE_BATTLE, MODE_MAP, Enemy, Battle } from "../models/gameModels"
 import {
     LOAD_STAGE,
     SET_CHAR_NAME,
@@ -30,14 +30,19 @@ function loadStage(index) {
 
             let objectType = Math.floor(Math.random() * 6);
             if (objectType == 1) {
-                objRow.push(new GameObject({ type: 1 }));
+                objRow.push(new MapObject({ type: 1 }));
             } else {
-                objRow.push(undefined);
+                objRow.push(null);
             }
         }
     }
 
     return new Stage({ index, width, height, tiles, objs });
+}
+
+function loadBattle(mapObj) {
+    const enemies = [new Enemy({})];
+    return new Battle({enemies});
 }
 
 function getNextMapPos({
@@ -186,8 +191,10 @@ export function game(state = initialState, action) {
 
             if (blocked) {
                 newGameAttrs.mode = MODE_BATTLE;
+                newGameAttrs.battle = loadBattle();
             } else {
                 newGameAttrs.mode = MODE_MAP;
+                delete newGameAttrs.battle;
             }
 
             break;

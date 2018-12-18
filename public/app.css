@@ -136,3 +136,15 @@ body>#root>div {
 .battle-mode {
 	background: yellow;
 }
+
+.battle-mode .battle-enemy {
+	background: red;
+	width: 80px;
+	height: 80px;
+}
+
+.battle-mode .player-team-member {
+	background: blue;
+	width: 80px;
+	height: 80px;
+}
