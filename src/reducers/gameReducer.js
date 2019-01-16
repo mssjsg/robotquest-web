@@ -1,206 +1,222 @@
 // this reducer is for reducing the rendering of the game
-import { Tile, Stage, Game, Position, Player, MapObject, MODE_BATTLE, MODE_MAP, Enemy, Battle } from "../models/gameModels"
 import {
-    LOAD_STAGE,
-    SET_CHAR_NAME,
-    MOVE_PLAYER,
-    TIME_UPDATED,
-    UPDATE_SCREEN_SIZE
-} from "../actions/gameActions"
+  Tile, Stage, Game, Position, Player, MapObject, MODE_BATTLE, MODE_MAP, Enemy, Battle, Skill,
+} from '../models/gameModels';
+import {
+  LOAD_STAGE,
+  SET_CHAR_NAME,
+  MOVE_PLAYER,
+  TIME_UPDATED,
+  UPDATE_SCREEN_SIZE,
+} from '../actions/gameActions';
 
 const initialState = new Game({
-    stage: loadStage(0),
-    player: new Player({})
+  stage: loadStage(0),
+  player: new Player({}),
 });
 
 function loadStage(index) {
-    let width = 10;
-    let height = 10;
-    let tiles = [];
-    let objs = [];
-    for (let x = 0; x < width; x++) {
-        let row = [];
-        tiles.push(row);
+  const width = 10;
+  const height = 10;
+  const tiles = [];
+  const objs = [];
+  for (let x = 0; x < width; x++) {
+    const row = [];
+    tiles.push(row);
 
-        let objRow = [];
-        objs.push(objRow);
-        for (let y = 0; y < width; y++) {
-            let tile = new Tile({ color: Math.floor(Math.random() * 10) });
-            row.push({ tile });
+    const objRow = [];
+    objs.push(objRow);
+    for (let y = 0; y < width; y++) {
+      const tile = new Tile({ color: Math.floor(Math.random() * 10) });
+      row.push({ tile });
 
-            let objectType = Math.floor(Math.random() * 6);
-            if (objectType == 1) {
-                objRow.push(new MapObject({ type: 1 }));
-            } else {
-                objRow.push(null);
-            }
-        }
+      const objectType = Math.floor(Math.random() * 6);
+      if (objectType == 1) {
+        objRow.push(new MapObject({ type: 1 }));
+      } else {
+        objRow.push(null);
+      }
     }
+  }
 
-    return new Stage({ index, width, height, tiles, objs });
+  return new Stage({
+    index, width, height, tiles, objs,
+  });
 }
 
 function loadBattle(mapObj) {
-    const enemies = [new Enemy({})];
-    return new Battle({enemies});
+  const enemies = [new Enemy({})];
+  return new Battle({ enemies });
 }
 
 function getNextMapPos({
-    stageMapPos,
-    targetPlayerPos,
-    speed,
-    tileDimen,
-    screenDimen,
-    limitMin,
-    limitMax,
-    screenPlayerPos
+  stageMapPos,
+  targetPlayerPos,
+  speed,
+  tileDimen,
+  screenDimen,
+  limitMin,
+  limitMax,
+  screenPlayerPos,
 }) {
-    let targetMapPos = screenDimen / 2 - tileDimen / 2 - targetPlayerPos * tileDimen;
-    let mapPos = targetMapPos;
-    let finished = false;
-    let blocked = null;
+  const targetMapPos = screenDimen / 2 - tileDimen / 2 - targetPlayerPos * tileDimen;
+  let mapPos = targetMapPos;
+  let finished = false;
+  let blocked = null;
 
-    if (stageMapPos != -1) {
-        if (targetMapPos > stageMapPos) {
-            mapPos = Math.min(stageMapPos + speed, targetMapPos);
-            let limit = screenPlayerPos - limitMin;
-            console.log(`limit min:${limit}`);
-            if (mapPos > limit) {
-                mapPos = limit;
-                blocked = { direction: 0 };
-            }
-        } else if (targetMapPos < stageMapPos) {
-            mapPos = Math.max(stageMapPos - speed, targetMapPos);
-            let limit = screenPlayerPos + tileDimen - limitMax;
-            console.log(`limit max:${limit}`);
-            if (mapPos < limit) {
-                mapPos = limit;
-                blocked = { direction: 1 };
-            }
-        } else {
-            finished = true;
-        }
+  if (stageMapPos != -1) {
+    if (targetMapPos > stageMapPos) {
+      mapPos = Math.min(stageMapPos + speed, targetMapPos);
+      const limit = screenPlayerPos - limitMin;
+      console.log(`limit min:${limit}`);
+      if (mapPos > limit) {
+        mapPos = limit;
+        blocked = { direction: 0 };
+      }
+    } else if (targetMapPos < stageMapPos) {
+      mapPos = Math.max(stageMapPos - speed, targetMapPos);
+      const limit = screenPlayerPos + tileDimen - limitMax;
+      console.log(`limit max:${limit}`);
+      if (mapPos < limit) {
+        mapPos = limit;
+        blocked = { direction: 1 };
+      }
     } else {
-        finished = true;
+      finished = true;
     }
-    return { mapPos, finished, blocked };
+  } else {
+    finished = true;
+  }
+  return { mapPos, finished, blocked };
 }
 
 export function game(state = initialState, action) {
-    let newGameAttrs = Object.assign({}, state);
-    switch (action.type) {
-        case LOAD_STAGE:
-            newGameAttrs.stage = loadStage(action.index);
-            break;
-        case SET_CHAR_NAME:
-            newGameAttrs.player = new Player(state.player);
-            newGameAttrs.player.name = action.name;
-            break;
-        case MOVE_PLAYER:
-            newGameAttrs.stage = new Stage(state.stage);
-            newGameAttrs.stage.targetPosition = new Position(action);
-            break;
-        case UPDATE_SCREEN_SIZE:
-            newGameAttrs.stage = new Stage(state.stage);
-            newGameAttrs.stage.screenWidth = action.width;
-            newGameAttrs.stage.screenHeight = action.height;
-            newGameAttrs.player = new Player(state.player);
-            newGameAttrs.player.screenPosition = new Position({
-                x: action.width / 2 - newGameAttrs.stage.tileDimen / 2,
-                y: action.height / 2 - newGameAttrs.stage.tileDimen / 2
-            })
-            break;
-        case TIME_UPDATED:
-            let stage = state.stage;
-            let player = state.player;
-            let screenPosition = player.screenPosition;
-            let objs = stage.objs;
-            console.log(`${stage.tileDimen} ${stage.screenHeight} ${stage.targetPosition.y}`);
-            
-            // find occupied indexes
-            let currentX = (screenPosition.x - stage.mapX) * 1.0 / stage.tileDimen;
-            let currentY = (screenPosition.y - stage.mapY) * 1.0 / stage.tileDimen;
-            let objectLimitIndexes = { minX: Math.floor(currentX) - 1, maxX: Math.ceil(currentX) + 1,
-                minY: Math.floor(currentY) - 1, maxY: Math.ceil(currentY) + 1 };
-            // console.log(`currentX: ${currentX} currentY: ${currentY} ${JSON.stringify(objectLimitIndexes)}`)
-            newGameAttrs.stage = new Stage(stage);
+  const newGameAttrs = Object.assign({}, state);
+  switch (action.type) {
+    case LOAD_STAGE:
+      newGameAttrs.stage = loadStage(action.index);
+      newGameAttrs.player = new Player(state.player);
+      newGameAttrs.player.skills = [];
+      newGameAttrs.player.skills.push(new Skill({
+        name: 'Punch',
+        damage: 100,
+      }));
+      break;
+    case SET_CHAR_NAME:
+      newGameAttrs.player = new Player(state.player);
+      newGameAttrs.player.name = action.name;
+      break;
+    case MOVE_PLAYER:
+      newGameAttrs.stage = new Stage(state.stage);
+      newGameAttrs.stage.targetPosition = new Position(action);
+      break;
+    case UPDATE_SCREEN_SIZE:
+      newGameAttrs.stage = new Stage(state.stage);
+      newGameAttrs.stage.screenWidth = action.width;
+      newGameAttrs.stage.screenHeight = action.height;
+      newGameAttrs.player = new Player(state.player);
+      newGameAttrs.player.screenPosition = new Position({
+        x: action.width / 2 - newGameAttrs.stage.tileDimen / 2,
+        y: action.height / 2 - newGameAttrs.stage.tileDimen / 2,
+      });
+      break;
+    case TIME_UPDATED:
+      const stage = state.stage;
+      const player = state.player;
+      const screenPosition = player.screenPosition;
+      const objs = stage.objs;
+      console.log(`${stage.tileDimen} ${stage.screenHeight} ${stage.targetPosition.y}`);
 
-            let changed = false;
-            let blocked = null;
-            if (stage.targetPosition.x != player.position.x) {
-                let yLimitIndex = Math.floor(currentY);
-                let minObj, maxObj;
-                if (objectLimitIndexes.minX >= 0) {
-                    minObj = objs[objectLimitIndexes.minX][yLimitIndex];
-                }
+      // find occupied indexes
+      const currentX = (screenPosition.x - stage.mapX) * 1.0 / stage.tileDimen;
+      const currentY = (screenPosition.y - stage.mapY) * 1.0 / stage.tileDimen;
+      const objectLimitIndexes = {
+        minX: Math.floor(currentX) - 1,
+        maxX: Math.ceil(currentX) + 1,
+        minY: Math.floor(currentY) - 1,
+        maxY: Math.ceil(currentY) + 1,
+      };
+      // console.log(`currentX: ${currentX} currentY: ${currentY} ${JSON.stringify(objectLimitIndexes)}`)
+      newGameAttrs.stage = new Stage(stage);
 
-                if (objectLimitIndexes.maxX < stage.width) {
-                    maxObj = objs[objectLimitIndexes.maxX][yLimitIndex];
-                }
+      let changed = false;
+      let blocked = null;
+      if (stage.targetPosition.x != player.position.x) {
+        const yLimitIndex = Math.floor(currentY);
+        let minObj; let
+          maxObj;
+        if (objectLimitIndexes.minX >= 0) {
+          minObj = objs[objectLimitIndexes.minX][yLimitIndex];
+        }
 
-                let limitMin = minObj != undefined ? (objectLimitIndexes.minX + 1) * stage.tileDimen : 0;
-                let limitMax = maxObj != undefined ? (objectLimitIndexes.maxX) * stage.tileDimen : stage.width * stage.tileDimen;
-                console.log(`min:${limitMin} max:${limitMax}`);
-                let result = getNextMapPos({
-                    stageMapPos: stage.mapX,
-                    targetPlayerPos: stage.targetPosition.x,
-                    speed: player.speed,
-                    tileDimen: stage.tileDimen,
-                    screenDimen: stage.screenWidth,
-                    limitMin,
-                    limitMax,
-                    screenPlayerPos: screenPosition.x
-                });
-                newGameAttrs.stage.mapX = result.mapPos;
-                if (result.finished) {
-                    newGameAttrs.player = new Player(state.player);
-                    newGameAttrs.player.position.x = stage.targetPosition.x;
-                }
-                changed = true;
-                blocked = result.blocked;
-            }
-            
-            if ((blocked || !changed || stage.mapY == -1) && stage.targetPosition.y != player.position.y) {
-                let xLimitIndex = Math.floor(currentX);
-                let minObj, maxObj;
-                if (objectLimitIndexes.minY >= 0) {
-                    minObj = objs[xLimitIndex][objectLimitIndexes.minY];
-                }
+        if (objectLimitIndexes.maxX < stage.width) {
+          maxObj = objs[objectLimitIndexes.maxX][yLimitIndex];
+        }
 
-                if (objectLimitIndexes.maxY < stage.height) {
-                    maxObj = objs[xLimitIndex][objectLimitIndexes.maxY];
-                }
+        const limitMin = minObj != undefined ? (objectLimitIndexes.minX + 1) * stage.tileDimen : 0;
+        const limitMax = maxObj != undefined ? (objectLimitIndexes.maxX) * stage.tileDimen : stage.width * stage.tileDimen;
+        console.log(`min:${limitMin} max:${limitMax}`);
+        const result = getNextMapPos({
+          stageMapPos: stage.mapX,
+          targetPlayerPos: stage.targetPosition.x,
+          speed: player.speed,
+          tileDimen: stage.tileDimen,
+          screenDimen: stage.screenWidth,
+          limitMin,
+          limitMax,
+          screenPlayerPos: screenPosition.x,
+        });
+        newGameAttrs.stage.mapX = result.mapPos;
+        if (result.finished) {
+          newGameAttrs.player = new Player(state.player);
+          newGameAttrs.player.position.x = stage.targetPosition.x;
+        }
+        changed = true;
+        blocked = result.blocked;
+      }
 
-                let result = getNextMapPos({
-                    stageMapPos: stage.mapY,
-                    targetPlayerPos: stage.targetPosition.y,
-                    speed: player.speed,
-                    tileDimen: stage.tileDimen,
-                    screenDimen: stage.screenHeight,
-                    limitMin: minObj != undefined ? (objectLimitIndexes.minY + 1) * stage.tileDimen : 0,
-                    limitMax: maxObj != undefined ? (objectLimitIndexes.maxY) * stage.tileDimen : stage.height * stage.tileDimen,
-                    screenPlayerPos: screenPosition.y
-                });
-                newGameAttrs.stage.mapY = result.mapPos;
-                if (result.finished) {
-                    newGameAttrs.player = new Player(state.player);
-                    newGameAttrs.player.position.y = stage.targetPosition.y;
-                }
-                blocked = result.blocked;
-            }
+      if ((blocked || !changed || stage.mapY == -1) && stage.targetPosition.y != player.position.y) {
+        const xLimitIndex = Math.floor(currentX);
+        let minObj; let
+          maxObj;
+        if (objectLimitIndexes.minY >= 0) {
+          minObj = objs[xLimitIndex][objectLimitIndexes.minY];
+        }
 
-            if (blocked) {
-                newGameAttrs.mode = MODE_BATTLE;
-                newGameAttrs.battle = loadBattle();
-            } else {
-                newGameAttrs.mode = MODE_MAP;
-                delete newGameAttrs.battle;
-            }
+        if (objectLimitIndexes.maxY < stage.height) {
+          maxObj = objs[xLimitIndex][objectLimitIndexes.maxY];
+        }
 
-            break;
-        default:
-            return state;
-    }
+        const result = getNextMapPos({
+          stageMapPos: stage.mapY,
+          targetPlayerPos: stage.targetPosition.y,
+          speed: player.speed,
+          tileDimen: stage.tileDimen,
+          screenDimen: stage.screenHeight,
+          limitMin: minObj != undefined ? (objectLimitIndexes.minY + 1) * stage.tileDimen : 0,
+          limitMax: maxObj != undefined ? (objectLimitIndexes.maxY) * stage.tileDimen : stage.height * stage.tileDimen,
+          screenPlayerPos: screenPosition.y,
+        });
+        newGameAttrs.stage.mapY = result.mapPos;
+        if (result.finished) {
+          newGameAttrs.player = new Player(state.player);
+          newGameAttrs.player.position.y = stage.targetPosition.y;
+        }
+        blocked = result.blocked;
+      }
 
-    return new Game(newGameAttrs);
+      if (blocked) {
+        newGameAttrs.mode = MODE_BATTLE;
+        newGameAttrs.battle = loadBattle();
+      } else {
+        newGameAttrs.mode = MODE_MAP;
+        delete newGameAttrs.battle;
+      }
+
+      break;
+    default:
+      return state;
+  }
+
+  return new Game(newGameAttrs);
 }
